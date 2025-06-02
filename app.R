@@ -1,54 +1,160 @@
 library(shiny)
-library(dplyr)
-library(readr)
-library(visNetwork)
-library(bslib)
+library(shiny.fluent)
 library(shinycssloaders)
+library(visNetwork)
+library(shinyjs)
 
+# Load modular components
+source("src/build-app/theme.R")                
+source("src/build-app/ui_main_network.R")      # Network Overview page UI
+source("src/build-app/ui_single_drug.R")       # Single Drug View page UI
+source("src/build-app/ui_pair_query.R")        # Drug Pair Query page UI
+source("src/build-app/server_main_network.R")  # Network Overview server logic
+source("src/build-app/server_single_drug.R")   # Single Drug View server logic
+source("src/build-app/server_pair_query.R")    # Drug Pair Query server logic
 
-# Load data and shared scripts
-source("src/data-processing/prepare_ddi_network.R")
-source("src/build-app/color_map.R")
-source("src/build-app/theme.R")
-source("src/build-app/ui_main_network.R")       
-source("src/build-app/ui_custom_query.R")
-source("src/build-app/server_main_network.R")  
-source("src/build-app/server_custom_query.R")
+# Load network data
+ddi_network_data <- readRDS("data/network_data.rds")
+severity_order <- c("Minor", "Moderate", "Major")
 
-# Prepare static data
-cat("→ Preparing data...\n")
-ddi_graph <- prepare_ddi_network()
+# ==========================================
+# UI
+ui <- fluidPage(
+  theme,
+  div(
+    class = "app-container",
 
-# Get all interaction types and apply colors
-interaction_types <- unique(ddi_graph$edges$interaction_type)
-color_map <- get_interaction_colors(interaction_types)
+    # ---------- HEADER ----------
+    div(
+      class = "app-header",
+      div(
+        class = "header-content",
+        div(
+          class = "header-text",
+          Text(variant = "xxLarge", "Toxic Drug-Drug Interaction Dashboard"),
+        )
+      )
+    ),
 
-# Use full dataset with colors
-nodes <- ddi_graph$nodes
-edges <- ddi_graph$edges %>%
-  mutate(color = color_map[interaction_type])
+    # ---------- MAIN LAYOUT ----------
+    div(
+      class = "main-layout",
 
-# Create plain list to pass to UI
-initial_data <- list(
-  nodes = nodes,
-  edges = edges,
-  interaction_types = interaction_types
+      # ----- LEFT PANEL: Sidebar + Filters -----
+      div(
+        class = "left-panel",
+
+        # Sidebar
+        div(
+          class = "app-sidebar",
+          Nav(
+            selectedKey = "network",
+            groups = list(
+              list(
+                links = list(
+                  list(name = "Network Overview", key = "network", url = "javascript:void(0)", icon = "Globe"),
+                  list(name = "Single Drug View", key = "single", url = "javascript:void(0)", icon = "SingleBookmark"),
+                  list(name = "Drug Pair Query", key = "query", url = "javascript:void(0)", icon = "Search")
+                )
+              )
+            ),
+            onLinkClick = JS("function(ev, item) {
+              var selectedKey = item.key;
+              Shiny.setInputValue('selected_tab', selectedKey, {priority: 'event'});
+              if (ev && ev.nativeEvent) {
+                ev.nativeEvent.stopImmediatePropagation();
+              }
+              if (ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+              }
+              return false;
+            }")
+          )
+        ),
+
+        # Filter panel (only for Network Overview tab)
+        conditionalPanel(
+          condition = "input.selected_tab === 'network'",
+          div(
+            class = "filters-card",
+            Text(variant = "mediumPlus", "Filters", block = TRUE),
+            div(
+              class = "filter-panel",
+              Dropdown.shinyInput(
+                inputId = "type_filter",
+                label = "Interaction Type",
+                options = list()  # populated in server
+              ),
+              Dropdown.shinyInput(
+                inputId = "severity_filter",
+                label = "Severity",
+                options = list()  # populated in server
+              )
+            )
+          )
+        )
+      ),
+
+      # ----- MAIN CONTENT AREA -----
+      div(
+        class = "main-content",
+        uiOutput("mainContent")
+      )
+    )
+  )
 )
 
-# Define UI 
-ui <- app_ui(global_data = initial_data)
-
-# Define Server
+# ==========================================
+# SERVER
 server <- function(input, output, session) {
-  global_data <- reactiveValues(
-    nodes = initial_data$nodes,
-    edges = initial_data$edges,
-    interaction_types = initial_data$interaction_types
+  # Track selected tab
+  current_tab <- reactiveVal("network")
+
+  observeEvent(input$selected_tab, {
+    isolate({
+      current_tab(input$selected_tab)
+    })
+  }, ignoreInit = TRUE)
+
+  # Update filter dropdown choices dynamically
+  observe({
+    updateDropdown.shinyInput(
+      session = session,
+      inputId = "type_filter",
+      options = unique(na.omit(ddi_network_data$edges$interaction_category)) |>
+        sort() |>
+        (\(x) c("All", x))() |>
+        lapply(function(opt) list(key = opt, text = opt)),
+      value = "All"  # Set default value
+    )
+
+    updateDropdown.shinyInput(
+      session = session,
+      inputId = "severity_filter",
+      options = c("All", severity_order) |>
+        lapply(function(opt) list(key = opt, text = opt)),
+      value = "All"  # Set default value
+    )
+  })
+
+  # Render the appropriate UI for each tab
+  output$mainContent <- renderUI({
+    switch(current_tab(),
+           "network" = ui_main_network("main_network"),
+           "single"  = ui_single_drug("single_drug"),
+           "query"   = ui_pair_query("pair_query"),
+           h2("Page not found"))
+  })
+
+  # Call server modules
+  callModule(server_main_network, "main_network", 
+    type_filter = reactive(input$type_filter %||% "All"),
+    severity_filter = reactive(input$severity_filter %||% "All")
   )
-  
-  # Call server functions with correct parameter order
-  server_main_network(global_data)(input, output, session)
-  server_custom_query(input, output, session, global_data)
+  # callModule(server_single_drug, "single_drug")
+  # callModule(server_pair_query, "pair_query")
 }
 
+# Run the app
 shinyApp(ui, server)
