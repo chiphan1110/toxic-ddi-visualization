@@ -1,0 +1,60 @@
+---
+title: "test-data"
+output: html_document
+---
+
+```{r}
+library(shiny)
+library(dplyr)
+library(readr)
+library(visNetwork)
+```
+
+```{r}
+print(getwd())
+# change dir to /Users/chiphan/Documents/Chi/1-Learning/2025-Spring/COMP4010-DataViz/Assignment/Project/Project-2/toxic-ddi-visualization
+setwd("/Users/chiphan/Documents/Chi/1-Learning/2025-Spring/COMP4010-DataViz/Assignment/Project/Project-2/toxic-ddi-visualization")
+source("src/data-processing/prepare_ddi_network.R")
+ddi_graph <- prepare_ddi_network()
+
+head(ddi_graph$nodes)
+head(ddi_graph$edges)
+
+```
+```{r}
+# Total nodes and edges
+nrow(ddi_graph$nodes)
+nrow(ddi_graph$edges)
+
+# Check for missing IDs (sanity check)
+any(is.na(ddi_graph$edges$from))  # should be FALSE
+any(is.na(ddi_graph$edges$to))    # should be FALSE
+
+# Check unique interaction types
+unique(ddi_graph$edges$interaction_type)
+```
+```{r}
+setwd("/Users/chiphan/Documents/Chi/1-Learning/2025-Spring/COMP4010-DataViz/Assignment/Project/Project-2/toxic-ddi-visualization")
+source("src/build-app/color_map.R")
+
+# Get unique interaction types
+interaction_types <- unique(ddi_graph$edges$interaction_type)
+
+# Create the mapping
+color_map <- get_interaction_colors(interaction_types)
+
+print(color_map)
+
+edges <- ddi_graph$edges %>%
+  mutate(color = color_map[interaction_type])
+
+head(edges)
+```
+```{r}
+# library(visNetwork)
+# visNetwork(nodes, edges) %>%
+#   visEdges(color = list(color = edges$color)) %>%
+#   visPhysics(stabilization = TRUE)
+
+```
+
