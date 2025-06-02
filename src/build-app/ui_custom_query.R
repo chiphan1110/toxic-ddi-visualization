@@ -1,5 +1,5 @@
 ui_custom_query <- function(global_data) {
-  fluidPage(
+  tabPanel("🔬 Query Drug Interactions",
     fluidRow(
       column(
         width = 3,
@@ -16,11 +16,7 @@ ui_custom_query <- function(global_data) {
       column(
         width = 9,
         h4("Subnetwork Visualization"),
-        shinycssloaders::withSpinner(
-          visNetworkOutput("custom_network", height = "700px"),
-          type = 4,
-          color = "#0078d4"
-        )
+        visNetworkOutput("custom_network", height = "700px")
       )
     )
   )

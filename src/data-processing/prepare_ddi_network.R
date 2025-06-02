@@ -1,28 +1,70 @@
 library(dplyr)
 library(readr)
 library(tidyr)
+library(memoise)
+library(RColorBrewer)
 
-prepare_ddi_network <- function(data_path = "data/toxicity_ddi_normalized.csv") {
+# Cache the data preparation function
+prepare_ddi_network <- memoise(function(data_path = "data/toxicity_ddi_normalized.csv") {
+  # Read in the dataset with optimized settings
+  ddi_data <- read_csv(
+    data_path,
+    show_col_types = FALSE,
+    col_types = cols(
+      drug1_name = col_character(),
+      drug2_name = col_character(),
+      interaction_type_normalized = col_character()
+    )
+  )
   
-  # Read in the dataset
-  ddi_data <- read_csv(data_path, show_col_types = FALSE)
-  
-  # Generate node list (unique drug names with IDs)
+  # Generate node list (unique drug names with IDs) - optimized
   nodes <- ddi_data %>%
     select(drug1_name, drug2_name) %>%
-    pivot_longer(cols = everything(), values_to = "drug") %>%
+    pivot_longer(
+      cols = everything(),
+      values_to = "drug",
+      names_to = NULL
+    ) %>%
     distinct(drug) %>%
     arrange(drug) %>%
-    mutate(id = row_number()) %>%
-    select(id, label = drug)
+    mutate(
+      id = row_number(),
+      title = drug,  # Add title for tooltips
+      group = "drug"  # Add group for styling
+    ) %>%
+    select(id, label = drug, title, group)
 
-  # Generate edge list (joining with node IDs)
+  # Get unique interaction types and their colors
+  interaction_types <- unique(ddi_data$interaction_type_normalized)
+  color_map <- get_interaction_colors(interaction_types)
+
+  # Generate edge list (joining with node IDs) - optimized
   edges <- ddi_data %>%
-    left_join(nodes, by = c("drug1_name" = "label")) %>%
+    left_join(
+      nodes %>% select(id, label),
+      by = c("drug1_name" = "label")
+    ) %>%
     rename(from = id) %>%
-    left_join(nodes, by = c("drug2_name" = "label")) %>%
+    left_join(
+      nodes %>% select(id, label),
+      by = c("drug2_name" = "label")
+    ) %>%
     rename(to = id) %>%
-    select(from, to, interaction_type = interaction_type_normalized)
+    select(from, to, interaction_type = interaction_type_normalized) %>%
+    # Add edge attributes for better visualization
+    mutate(
+      color = color_map[interaction_type]
+    )
 
-  list(nodes = nodes, edges = edges)
-}
+  # Return processed data
+  list(
+    nodes = nodes,
+    edges = edges,
+    metadata = list(
+      total_drugs = nrow(nodes),
+      total_interactions = nrow(edges),
+      unique_interaction_types = interaction_types,
+      color_map = color_map
+    )
+  )
+})

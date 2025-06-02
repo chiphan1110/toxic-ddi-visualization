@@ -5,7 +5,7 @@ ui_main_network <- function(global_data) {
       sidebarPanel(
         selectInput("type_filter", "Select Interaction Type:",
                     choices = c("All", global_data$interaction_types),
-                    selected = "neurotoxicity")
+                    selected = "All")
       ),
       mainPanel(
         shinycssloaders::withSpinner(
