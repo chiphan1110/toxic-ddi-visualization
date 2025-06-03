@@ -167,6 +167,35 @@ server <- function(input, output, session) {
     )
   })
 
+  # Query tab: update drug selection inputs
+  observe({
+    req(input$selected_tab == "query")
+
+    drug_names <- sort(unique(ddi_network_data$nodes$label))
+
+    # updateSelectizeInput(
+    #   session = session,
+    #   inputId = "pair_query-drug1",  # module-scoped ID
+    #   choices = drug_names,
+    #   server = TRUE
+    # )
+
+    # updateSelectizeInput(
+    #   session = session,
+    #   inputId = "pair_query-drug2",  # module-scoped ID
+    #   choices = drug_names,
+    #   server = TRUE
+    # )
+    updateSelectizeInput(
+      session,
+      inputId = "pair_query-multi_drug_select",
+      choices = sort(unique(ddi_network_data$nodes$label)),
+      server = TRUE
+    )
+  })
+
+
+
   # Render the appropriate UI for each tab
   output$mainContent <- renderUI({
     switch(current_tab(),
@@ -185,7 +214,7 @@ server <- function(input, output, session) {
            ddi_network_data = ddi_network_data,
            selected_drug = reactive(input$single_drug_select))
 
-  # callModule(server_pair_query, "pair_query")
+  callModule(server_pair_query, "pair_query")
 }
 
 # Run the app

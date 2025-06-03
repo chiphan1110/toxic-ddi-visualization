@@ -1,11 +1,23 @@
 ui_pair_query <- function(id) {
   ns <- NS(id)
 
-  Stack(
-    tokens = list(childrenGap = 20),
-    style = list(padding = 20, height = "100%"),
-    
-    Text(variant = "large", "Drug Pair Query (Coming Soon)")
-    # TODO: Add inputs and outputs later
+  div(
+    class = "pair-query-layout",
+    style = "padding: 12px; display: flex; flex-direction: column; gap: 16px;",
+
+    # Replace two selects with one
+    selectizeInput(
+      ns("multi_drug_select"),
+      label = "Select 2–5 Drugs:",
+      choices = NULL,
+      multiple = TRUE,
+      options = list(
+        placeholder = "Type to search for drugs...",
+        maxItems = 5
+      )
+    ),
+
+    # Output container for cards
+    uiOutput(ns("table_ui"))
   )
 }

@@ -1,6 +1,7 @@
 library(dplyr)
 library(tidyr)
 library(plotly)  
+library(shiny.fluent)
 
 interaction_color_map <- list(
   cardiotoxicity       = "#F1948A",  # soft rose
