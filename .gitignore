@@ -2,3 +2,6 @@ data/TWOSIDES.csv
 data/twosides_minimal.csv
 
 .Rproj.user
+.Rhistory
+.Rproj
+
