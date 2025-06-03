@@ -1,3 +1,4 @@
+
 # === Color for interaction types ===
 interaction_color_map <- list(
   cardiotoxicity = "#FF4C4C",
