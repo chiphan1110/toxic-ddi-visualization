@@ -28,10 +28,12 @@ ui <- fluidPage(
     div(
       class = "app-header",
       div(
-        class = "header-content",
+        class = "header-left",
+        tags$i(class = "ms-Icon ms-Icon--TestBeaker", style = "font-size: 36px; color: white;"),
         div(
-          class = "header-text",
-          Text(variant = "xxLarge", "Toxic Drug-Drug Interaction Dashboard"),
+          class = "header-text-block",
+          tags$div(class = "header-title", "Toxic Drug-Drug Interaction Dashboard"),
+          tags$div(class = "header-subtitle", "Visualizing toxicity patterns across known drug combinations")
         )
       )
     ),
@@ -107,11 +109,25 @@ ui <- fluidPage(
                 maxOptions = 10
               ),            )
           )
+        ),
+        # Disclaimer Card
+        div(
+          class = "sidebar-note-card",
+          style = "
+            margin-top: 20px;
+            padding: 12px 14px;
+            background-color: #fffbe6;
+            border-left: 4px solid #f5c518;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #5a5a5a;
+            line-height: 1.4;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          ",
+          tags$b("\u26A0\uFE0F Note:"),
+          tags$p("The information shown in this dashboard reflects the limited dataset of toxic drug interactions and may be incomplete. These results are intended for research and reference purposes only — they do not constitute medical advice.")
         )
-
       ),
-
-
       # ----- MAIN CONTENT AREA -----
       div(
         class = "main-content",
