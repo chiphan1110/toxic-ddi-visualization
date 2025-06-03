@@ -202,6 +202,16 @@ server <- function(input, output, session) {
     #   choices = drug_names,
     #   server = TRUE
     # )
+
+    '''
+    updateSelectizeInput(
+      session,
+      inputId = "pair_query-multi_drug_select",
+      choices = sort(unique(ddi_network_data$nodes$label)),
+      server = TRUE
+    )
+    '''
+
     updateSelectizeInput(
       session,
       inputId = "pair_query-multi_drug_select",
