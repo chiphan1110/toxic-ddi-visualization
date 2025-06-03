@@ -1,12 +1,11 @@
-ui_pair_query <- function() {
+ui_pair_query <- function(id) {
+  ns <- NS(id)
+
   Stack(
     tokens = list(childrenGap = 20),
-    Text(variant = "xLarge", "Drug Pair Query"),
-    Stack(
-      tokens = list(childrenGap = 10),
-      Text("selectInput('drug1') and selectInput('drug2') go here"),
-      Text("visNetworkOutput('pair_network')"),
-      Text("DTOutput('interaction_table')")
-    )
+    style = list(padding = 20, height = "100%"),
+    
+    Text(variant = "large", "Drug Pair Query (Coming Soon)")
+    # TODO: Add inputs and outputs later
   )
 }

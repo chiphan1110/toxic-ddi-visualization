@@ -26,6 +26,7 @@ theme <- tags$head(
       flex: 1;
       display: flex;
       overflow: hidden;
+      width: 100%;
     }
 
     .left-panel {
@@ -39,9 +40,8 @@ theme <- tags$head(
     .main-content {
       flex: 1;
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
-
+      flex-direction: column;      overflow: hidden;
+      background-color: #ffffff;
     }
 
     .network-plot-container {
@@ -111,6 +111,22 @@ theme <- tags$head(
       border-color: #0078D4 !important;
       box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2) !important;
     }
-    
+
+    /* Styles for Single Drug View layout */
+    .single-drug-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100%; /* Matches the height from the Stack */
+      background-color: #ffffff; /* Matches the background color from the Stack */
+      flex: 1; /* Matches the flex property from the Stack */
+    }
+
+    .network-plot-container {
+      flex: 1;
+      display: flex;
+      background-color: #1b1a19;
+      border-radius: 8px;
+      overflow: hidden;
+    }
   "))
 )

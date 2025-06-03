@@ -13,7 +13,7 @@ ddi_clean <- ddi_raw %>%
   filter(!is.na(interaction_type_normalized), !is.na(drug1_id), !is.na(drug2_id)) %>%
   distinct(drug1_id, drug2_id, .keep_all = TRUE)
 
-# Create edge list with color + width
+# Create edge list with color + width and include severity
 edges <- ddi_clean %>%
   mutate(
     color = sapply(interaction_type_normalized, map_interaction_color),
@@ -24,26 +24,22 @@ edges <- ddi_clean %>%
     to = drug2_id,
     title = ddinter_interaction,
     interaction_category = interaction_type_normalized,
+    ddinter_severity, 
     width,
     color
   )
 
 # === Node color logic ===
-# Count edges per node per interaction type
 node_edge_counts <- edges %>%
   select(from, to, interaction_category) %>%
   pivot_longer(cols = c(from, to), names_to = "direction", values_to = "node_id") %>%
   group_by(node_id, interaction_category) %>%
   summarise(count = n(), .groups = "drop")
 
-# Choose dominant type per node
 dominant_interaction <- node_edge_counts %>%
   group_by(node_id) %>%
   slice_max(order_by = count, n = 1, with_ties = FALSE) %>%
-  ungroup()
-
-# Map node color from dominant interaction
-dominant_interaction <- dominant_interaction %>%
+  ungroup() %>%
   mutate(color = sapply(interaction_category, map_interaction_color))
 
 # Create node list

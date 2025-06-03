@@ -48,28 +48,25 @@ ui <- fluidPage(
         div(
           class = "app-sidebar",
           Nav(
-            selectedKey = "network",
+            selectedKey = NULL, 
             groups = list(
               list(
                 links = list(
-                  list(name = "Network Overview", key = "network", url = "javascript:void(0)", icon = "Globe"),
-                  list(name = "Single Drug View", key = "single", url = "javascript:void(0)", icon = "SingleBookmark"),
-                  list(name = "Drug Pair Query", key = "query", url = "javascript:void(0)", icon = "Search")
+                  list(name = "Network Overview", key = "network", url = "#", icon = "Globe"),
+                  list(name = "Single Drug View", key = "single", url = "#", icon = "SingleBookmark"),
+                  list(name = "Drug Pair Query", key = "query", url = "#", icon = "Search")
                 )
               )
             ),
-            onLinkClick = JS("function(ev, item) {
-              var selectedKey = item.key;
-              Shiny.setInputValue('selected_tab', selectedKey, {priority: 'event'});
-              if (ev && ev.nativeEvent) {
-                ev.nativeEvent.stopImmediatePropagation();
+            onLinkClick = JS("
+              function(ev, item) {
+                if (item && item.key) {
+                  Shiny.setInputValue('selected_tab', item.key, {priority: 'event'});
+                }
+                if (ev) ev.preventDefault();
+                return false;
               }
-              if (ev) {
-                ev.stopPropagation();
-                ev.preventDefault();
-              }
-              return false;
-            }")
+            ")
           )
         ),
 
@@ -93,8 +90,27 @@ ui <- fluidPage(
               )
             )
           )
+        ),
+        # Single Drug (only for Single Drug View tab)
+        conditionalPanel(
+          condition = "input.selected_tab === 'single'",
+          div(
+            class = "filters-card",
+            Text(variant = "mediumPlus", "Drug Selection", block = TRUE),
+            selectizeInput(
+              inputId = "single_drug_select",
+              label = NULL,
+              choices = NULL,
+              selected = NULL,
+              options = list(
+                placeholder = 'Type a drug name...',
+                maxOptions = 10
+              ),            )
+          )
         )
+
       ),
+
 
       # ----- MAIN CONTENT AREA -----
       div(
@@ -138,6 +154,19 @@ server <- function(input, output, session) {
     )
   })
 
+  observe({
+    req(input$selected_tab == "single")  # optional but safer
+
+    drug_names <- sort(unique(ddi_network_data$nodes$label))
+
+    updateSelectizeInput(
+      session = session,
+      inputId = "single_drug_select",
+      choices = drug_names,
+      server = TRUE
+    )
+  })
+
   # Render the appropriate UI for each tab
   output$mainContent <- renderUI({
     switch(current_tab(),
@@ -152,7 +181,10 @@ server <- function(input, output, session) {
     type_filter = reactive(input$type_filter %||% "All"),
     severity_filter = reactive(input$severity_filter %||% "All")
   )
-  # callModule(server_single_drug, "single_drug")
+  callModule(server_single_drug, "single_drug", 
+           ddi_network_data = ddi_network_data,
+           selected_drug = reactive(input$single_drug_select))
+
   # callModule(server_pair_query, "pair_query")
 }
 
