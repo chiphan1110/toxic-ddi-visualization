@@ -92,7 +92,9 @@ shiny::runApp("app.R")
 * Nguyen Mau Hoang Hiep
 * Thai Ba Hung
 
+
 This project was developed as part of **COMP4010: Data Visualization (Spring 2025)**. We would like to thank the instruction team for their guidance throughout this project!
+
 ---
 
 ## ⚠️ Disclaimer
