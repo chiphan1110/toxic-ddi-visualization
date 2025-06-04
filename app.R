@@ -125,7 +125,7 @@ ui <- fluidPage(
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
           ",
           tags$b("\u26A0\uFE0F Note:"),
-          tags$p("The information shown in this dashboard reflects the limited dataset of toxic drug interactions and may be incomplete. These results are intended for research and reference purposes only — they do not constitute medical advice.")
+          tags$p("The information shown in this dashboard reflects the limited dataset of toxic drug interactions and may be incomplete. These results are intended for research and reference purposes only, they do not constitute medical advice.")
         )
       ),
       # ----- MAIN CONTENT AREA -----
@@ -188,29 +188,6 @@ server <- function(input, output, session) {
     req(input$selected_tab == "query")
 
     drug_names <- sort(unique(ddi_network_data$nodes$label))
-
-    # updateSelectizeInput(
-    #   session = session,
-    #   inputId = "pair_query-drug1",  # module-scoped ID
-    #   choices = drug_names,
-    #   server = TRUE
-    # )
-
-    # updateSelectizeInput(
-    #   session = session,
-    #   inputId = "pair_query-drug2",  # module-scoped ID
-    #   choices = drug_names,
-    #   server = TRUE
-    # )
-
-    
-    # updateSelectizeInput(
-    #  session,
-    #  inputId = "pair_query-multi_drug_select",
-    #  choices = sort(unique(ddi_network_data$nodes$label)),
-    #  server = TRUE
-    # )
-    
 
     updateSelectizeInput(
       session,

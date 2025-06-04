@@ -46,7 +46,8 @@ pair_data <- reactive({
     `Drug 2` = paste0(filtered_named$drug2_id, " (", filtered_named$drug2_name, ")"),
     `Interaction Type` = str_to_sentence(filtered_named$interaction_category),
     `Severity` = filtered_named$ddinter_severity,
-    `Description` = filtered_named$title
+    `Description` = filtered_named$title,
+    `Management` = filtered_named$ddinter_management
   )
 })
 
@@ -65,9 +66,13 @@ pair_data <- reactive({
     drug2 <- row[[2]] %||% "N/A"
     type <- row[[3]] %||% "N/A"
     severity <- row[[4]] %||% "N/A"
-    description <- row[[5]]
+    description <- row[[5]] 
+    management <- row[[6]]
     if (is.null(description) || !nzchar(description)) {
       description <- "N/A"
+    }
+    if (is.null(management) || !nzchar(management)) {
+      management <- "N/A"
     }
 
     # Normalize severity (case-insensitive)
@@ -126,7 +131,10 @@ pair_data <- reactive({
           Text(style = list(fontWeight = 600), "Severity:"),
           Text(style = list(color = sev_color, fontWeight = 600), severity_text),
           Text(style = list(fontWeight = 600), "Description:"),
-          Text(style = list(whiteSpace = "pre-line", fontWeight = 400), description)
+          Text(style = list(whiteSpace = "pre-line", fontWeight = 400), description),
+          Text(style = list(fontWeight = 600), "Management:"),
+          Text(style = list(whiteSpace = "pre-line", fontWeight = 400), management)
+
         )
       )
     )

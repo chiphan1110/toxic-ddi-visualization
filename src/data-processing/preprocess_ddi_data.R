@@ -25,6 +25,7 @@ edges <- ddi_clean %>%
     title = ddinter_interaction,
     interaction_category = interaction_type_normalized,
     ddinter_severity, 
+    ddinter_management,    
     width,
     color
   )
