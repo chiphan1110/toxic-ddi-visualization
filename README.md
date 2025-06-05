@@ -44,9 +44,25 @@ The dashboard includes **three main interactive tabs**, each tailored to differe
 | `scales`          | Rescaling visual encodings (e.g., node size, opacity)|
 | `shiny.fluent`    | Fluent Design-based modern UI components             |
 | `shiny.react`     | React-based UI enhancements                          |
-| `Selenium (Python)` | Data crawling from DDInter                          |
+| `Selenium (Python)` | Data crawling from DDInter                         |
 
 ---
+
+## 🌐 Dashboard 
+
+Explore the interactive **Toxic Drug-Drug Interaction Dashboard** deployed via Posit Connect:
+🔗 [https://chiphan1110-toxic-ddi-visualization.share.connect.posit.cloud](https://chiphan1110-toxic-ddi-visualization.share.connect.posit.cloud)
+
+Some screenshots: 
+
+![Network Overview](assets/Main-Dashboard.png) 
+
+![Single Drug View](assets/Single-Drug.png)
+
+![Drug Pair Query](assets/Drug-Pair.png) 
+
+---
+
 
 ## 🚀 Installation Guide
 
@@ -68,15 +84,6 @@ shiny::runApp("app.R")
 ```
 > 📍 Make sure `data/network_data.rds` and `data/ddi_with_ddinter_info.csv` are present in the `data/` folder.
 
----
-
-## 🖼️  Dashboard Screenshots
-
-![Network Overview](assets/Main-Dashboard.png) 
-
-![Single Drug View](assets/Single-Drug.png)
-
-![Drug Pair Query](assets/Drug-Pair.png) 
 
 ---
 
