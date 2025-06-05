@@ -51,7 +51,7 @@ The dashboard includes **three main interactive tabs**, each tailored to differe
 ## 🌐 Dashboard 
 
 Explore the interactive **Toxic Drug-Drug Interaction Dashboard** deployed via Posit Connect:
-🔗 [https://chiphan1110-toxic-ddi-visualization.share.connect.posit.cloud](https://chiphan1110-toxic-ddi-visualization.share.connect.posit.cloud)
+🔗 [https://chiphan1110-toxic-ddi-visualization.share.connect.posit.cloud/](https://chiphan1110-toxic-ddi-visualization.share.connect.posit.cloud/)
 
 Some screenshots: 
 
